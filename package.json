@@ -1,0 +1,17 @@
+{
+  "name": "tcs-fault-tolerance-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://9996184@bitbucket.org/9996184/tcs-fault-tolerance-system.git"
+  },
+  "keywords": [],
+  "author": "Aidan Stucley",
+  "license": "",
+  "homepage": "https://bitbucket.org/9996184/tcs-fault-tolerance-system#readme"
+}
