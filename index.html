@@ -7,27 +7,76 @@
   <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
     body {
-      font-family: 'Open Sans';
+      font-family: 'Open Sans', 'Roboto', sans-serif;
+    }
+
+    .angular-initial-hide {
+      display: none;
     }
 
   </style>
 </head>
 
 <body class="bg-light">
-  <div class="container py-md-5 py-4">
+  <div class="container py-4 angular-initial-hide" ng-app="tcs-fault-tolerance-system" ng-controller="app-controller">
 
-    <h1 class="h2 text-center py-md-5 py-4">
+    <h1 class="h2 text-center py-4">
       TCS Fault Tolerance System
     </h1>
 
-    <div class="col-lg-6 mx-auto py-md-3 py-2">
+    <div class="col-lg-6 mx-auto py-2">
       <label for="name">Name</label>
-      <input type="text" class="form-control" id="name" placeholder="" value="" required>
+      <input type="text" class="form-control" id="name" ng-model="model.name" required>
     </div>
 
-    <div class="col-lg-6 mx-auto py-md-3 py-2">
+    <div class="col-lg-6 mx-auto py-2">
       <label for="description">Description</label>
-      <input type="text" class="form-control" id="description" placeholder="" value="" required>
+      <textarea class="form-control" id="description" ng-model="model.description"></textarea>
+    </div>
+
+    <div class="col-lg-6 mx-auto py-2">
+      <div class="py-2" ng-show="var.selectedFiles.length < const.maxFileLimit">
+        <label for="file-upload-control">Upload</label>
+        <div class="custom-file input-group">
+          <input id="file-upload-control" class="custom-file-input" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.jpg,.jpeg,.png,.bmp,.tif,.tiff" onchange="angular.element(this).scope().event.getFileDetails(this)" />
+          <label class="custom-file-label" for="file-upload-control">Choose file</label>
+        </div>
+      </div>
+      <table class="table table-responsive table-striped table-hover" ng-show="var.selectedFiles.length > 0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>File Name</th>
+            <th>Size</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="file in var.selectedFiles track by $index">
+            <td>{{$index+1}}</td>
+            <td>{{file.name}} ({{file.type}})</td>
+            <td>
+              {{func.formatFileSize(file.size)}}
+            </td>
+            <td class="text-center">
+              <button class="btn px-2 py-0 btn-danger" ng-click="event.removeFile(file)">
+                <span class="h4">&times;</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-center text-danger">
+        <small>Maximum {{const.maxFileLimit}} files allowed to upload</small>
+      </div>
+    </div>
+
+    <div class="col-md-2 mx-auto py-md-4 py-3">
+      <div class="text-center">
+        <button class="btn btn-primary btn-block" ng-click="event.submit()">
+          Submit
+        </button>
+      </div>
     </div>
 
   </div>
