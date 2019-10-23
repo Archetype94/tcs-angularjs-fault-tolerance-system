@@ -13,5 +13,10 @@
   "keywords": [],
   "author": "Aidan Stucley",
   "license": "",
-  "homepage": "https://bitbucket.org/9996184/tcs-fault-tolerance-system#readme"
+  "homepage": "https://bitbucket.org/9996184/tcs-fault-tolerance-system#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongodb": "^3.3.3"
+  },
+  "devDependencies": {}
 }
