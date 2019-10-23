@@ -22,10 +22,10 @@
     };
 
     $scope.var = {
-      selectedFiles: []
+      selectedFiles: [],
+      model: {}
     };
 
-    $scope.model = {}
 
     $scope.state = {
       submitting: false,
@@ -40,20 +40,12 @@
       submit: submit
     };
 
-    $scope.func = {
-      formatFileSize: formatFileSize
+    $scope.format = {
+      fileSize: formatFileSize
     };
 
     // Globalise submit so recaptcha can submit after user validation
     $window.submit = $scope.event.submit;
-
-    // Required field placeholder asterix append
-    /*jQuery(document).ready(function () {
-  jQuery('input[required]').each(function () {
-    jQuery(this).attr('placeholder', jQuery(this).attr('placeholder') + ' *')
-  });
-  jQuery('select[required] option[disabled]').append(' *');
-})*/
 
     // Loading complete
     jQuery('.angular-initial-hide').fadeIn().removeClass('angular-initial-hide');
@@ -102,12 +94,10 @@
       jQuery('.ng-invalid').addClass('is-invalid');
       jQuery('.ng-valid').addClass('is-valid');
 
-      sendSubmitRequest();
-
-      return true;
+      submitRequest();
     }
 
-    function sendSubmitRequest() {
+    function submitRequest() {
       let viewModel = Object.assign({}, $scope.var.model);
 
       viewModel.filesAmount = $scope.var.selectedFiles.length;
@@ -131,19 +121,19 @@
             });
           }, 2000);
         }
-        //console.log(response);
+        console.log(response);
       }, function (response) {
         $scope.state.submitting = false;
 
         if (response.data == null) {
-          alert('Submission failed: ' + 'Please check your internet connection and try again' + $scope.const.supportContact)
+          alert('Submission failed: ' + 'Please check your internet connection and try again')
         }
         else {
           try {
-            alert('Form invalid: ' + response.data.message);
+            alert('Form invalid: ' + response.data.errmsg);
           }
           catch (e) {
-            alert('Submission failed: ' + e.message + $scope.const.supportContact);
+            alert('Submission failed: ' + e.message);
             console.error(e.message);
           }
         }
@@ -213,7 +203,7 @@
             if (response.data.message == 'Retry limit exceeded') {
               $scope.state.reuploading = false;
               $scope.state.submitting = false;
-              alert('Submission failed: ' + response.data.message + $scope.const.supportContact);
+              alert('Submission failed: ' + response.data.message);
             }
             else {
               $scope.var.selectedFiles.forEach((file) => {
@@ -235,7 +225,7 @@
           catch (e) {
             $scope.state.reuploading = false;
             $scope.state.submitting = false;
-            alert('Error: ' + e.message + $scope.const.supportContact);
+            alert('Error: ' + e.message);
             console.error(e.message);
           }
           $scope.state.verifyingFiles = false;

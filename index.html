@@ -26,12 +26,12 @@
 
     <div class="col-lg-6 mx-auto py-2">
       <label for="name">Name</label>
-      <input type="text" class="form-control" id="name" ng-model="model.name" required>
+      <input type="text" class="form-control" id="name" ng-model="var.model.name" required>
     </div>
 
     <div class="col-lg-6 mx-auto py-2">
       <label for="description">Description</label>
-      <textarea class="form-control" id="description" ng-model="model.description"></textarea>
+      <textarea class="form-control" id="description" ng-model="var.model.description"></textarea>
     </div>
 
     <div class="col-lg-6 mx-auto py-2">
@@ -56,7 +56,7 @@
             <td>{{$index+1}}</td>
             <td>{{file.name}} ({{file.type}})</td>
             <td>
-              {{func.formatFileSize(file.size)}}
+              {{format.fileSize(file.size)}}
             </td>
             <td class="text-center">
               <button class="btn px-2 py-0 btn-danger" ng-click="event.removeFile(file)">
