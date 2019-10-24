@@ -14,9 +14,7 @@
       fileSizeLimit: 4000000,
       allowedFileExtensions: [
         'doc', 'docx', 'pdf',
-        'xls', 'xlsx', 'csv',
-        'jpg', 'jpeg', 'png',
-        'bmp', 'tif', 'tiff'
+        'jpg', 'jpeg', 'png'
       ],
       retryTimeoutLength: 5000
     };
@@ -130,7 +128,7 @@
         }
         else {
           try {
-            alert('Form invalid: ' + response.data.errmsg);
+            alert('Form invalid: ' + response.data);
           }
           catch (e) {
             alert('Submission failed: ' + e.message);
@@ -144,7 +142,7 @@
 
     function uploadSingleFile(file, submissionId) {
       let formData = new FormData();
-      formData.append('UploadFile', file);
+      formData.append('file', file);
       file.progress = 0;
 
       let reqObj = new XMLHttpRequest();
@@ -166,14 +164,14 @@
 
         if ($scope.var.uploadTrackingNumber >= $scope.var.selectedFiles.length) {
           console.log('Upload complete');
-          verifyFiles(submissionId, true);
+          //verifyFiles(submissionId, true);
         }
       }, false);
 
-      reqObj.open('PUT', `/submitfiles=${submissionId}`);
+      reqObj.open('POST', `/upload/${submissionId}`);
       reqObj.onerror = () => {
-        if (!$scope.state.verifyingFiles)
-          verifyFiles(submissionId);
+        /*if (!$scope.state.verifyingFiles)
+  verifyFiles(submissionId);*/
       };
       reqObj.send(formData);
     }
@@ -200,14 +198,14 @@
         else {
           console.error('Upload verification failed');
           try {
-            if (response.data.message == 'Retry limit exceeded') {
+            if (response.data == 'Retry limit exceeded') {
               $scope.state.reuploading = false;
               $scope.state.submitting = false;
-              alert('Submission failed: ' + response.data.message);
+              alert('Submission failed: ' + response.data);
             }
             else {
               $scope.var.selectedFiles.forEach((file) => {
-                if (response.data.message.indexOf(file.name) < 0) {
+                if (response.data.indexOf(file.name) < 0) {
                   $scope.state.reconnecting = false;
                   $scope.state.reuploading = true;
                   if (uploadFinished) {
