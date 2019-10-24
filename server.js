@@ -1,9 +1,7 @@
 console.log('Initializing...')
 
-const
-  mongoClient = require('mongodb').MongoClient
-var
-  db
+const mongoClient = require('mongodb').MongoClient
+var db
 tryFunction(() => {
   mongoClient.connect('mongodb://localhost/',
     (error, client) => {
@@ -50,11 +48,13 @@ const
       fileSize: 4000000
     },
     fileFilter: (req, file, callback) => {
-      allowedFileTypes = /doc|docx|pdf|jpeg|jpg|png/;
-      const extension = allowedFileTypes.test(path.extname(file.originalname).toLowerCase());
-      const mimeType = allowedFileTypes.test(file.mimetype);
+      const
+        allowedFileTypes = /doc|docx|pdf|jpeg|jpg|png/,
+        extension = allowedFileTypes.test(path.extname(file.originalname).toLowerCase()),
+        mimeType = allowedFileTypes.test(file.mimetype)
+
       if (extension && mimeType) {
-        return callback(null, true);
+        return callback(null, true)
       }
       else {
         callback('Invalid file type')
