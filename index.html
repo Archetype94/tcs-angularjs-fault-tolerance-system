@@ -42,10 +42,9 @@
           <label class="custom-file-label" for="file-upload-control">Choose file</label>
         </div>
       </div>
-      <table class="table table-responsive table-striped table-hover" ng-show="var.selectedFiles.length > 0">
+      <table class="table table-responsive-sm table-striped table-hover" ng-show="var.selectedFiles.length > 0">
         <thead>
           <tr>
-            <th>#</th>
             <th>File Name</th>
             <th>Size</th>
             <th></th>
@@ -53,7 +52,6 @@
         </thead>
         <tbody>
           <tr ng-repeat="file in var.selectedFiles track by $index">
-            <td>{{$index+1}}</td>
             <td>{{file.name}} ({{file.type}})</td>
             <td>
               {{format.fileSize(file.size)}}
@@ -71,7 +69,7 @@
       </div>
     </div>
 
-    <div class="col-md-2 mx-auto py-md-4 py-3">
+    <div class="col-md-3 mx-auto py-md-4 py-3">
       <div class="text-center">
         <button class="btn btn-primary btn-block" ng-click="event.submit()">
           Submit
@@ -79,6 +77,22 @@
       </div>
     </div>
 
+    <div class="col-md-6 mx-auto py-md-4 py-3">
+      <samp>
+        <div>submitting = {{state.submitting}}</div>
+        <div>reconnecting = {{state.reconnecting}}</div>
+        <div>reuploading = {{state.reuploading}}</div>
+        <div>files uploaded = {{var.uploadSuccessCount}}/{{var.selectedFiles.length}}</div>
+        <div ng-repeat="file in var.selectedFiles track by $index" ng-show="file.progress > 0 && file.progress < 100">
+          {{file.name}}
+          <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{file.progress}}%">
+              {{file.progress}}%
+            </div>
+          </div>
+        </div>
+      </samp>
+    </div>
   </div>
 
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>

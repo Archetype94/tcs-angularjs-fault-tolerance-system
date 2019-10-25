@@ -27,9 +27,8 @@
 
     $scope.state = {
       submitting: false,
-      reuploading: false,
-      verifyingFiles: false,
-      reconnecting: false
+      reconnecting: false,
+      reuploading: false
     };
 
     $scope.event = {
@@ -63,8 +62,7 @@
             if (element.files[i].size > $scope.const.fileSizeLimit)
               alert(
                 'File size limit exceeded: ' +
-                element.files[i].name + ' exceeds the file size limit of ' + formatFileSize($scope.const.fileSizeLimit) + ' and has been discarded',
-                () => {}
+                element.files[i].name + ' exceeds the file size limit of ' + formatFileSize($scope.const.fileSizeLimit) + ' and has been discarded'
               );
             else
               $scope.const.allowedFileExtensions.forEach((allowedExtension) => {
@@ -81,9 +79,7 @@
     }
 
     function removeFile(file) {
-      let index = $scope.var.selectedFiles.indexOf(file);
-
-      $scope.var.selectedFiles.splice(index, 1);
+      $scope.var.selectedFiles.splice($scope.var.selectedFiles.indexOf(file), 1);
     }
 
     function submit() {
@@ -103,24 +99,25 @@
       console.log(viewModel);
 
       $scope.state.submitting = true;
-      $scope.var.uploadTrackingNumber = null;
+      $scope.var.uploadSuccessCount = 0;
 
-      $http.post('/submit', viewModel).then(function (response) {
-        if ($scope.var.selectedFiles.length === 0) {
-          $scope.var.uploadTrackingNumber = 0;
+      $http.post('/submit', viewModel).then((response) => {
+        $scope.state.submitting = false;
+
+        if ($scope.var.selectedFiles.length == 0) {
+          $scope.var.uploadSuccessCount = 0;
         }
         else {
           $timeout(function () {
             let submissionId = response.data;
-            $scope.var.uploadTrackingNumber = 0;
 
             $scope.var.selectedFiles.forEach(function (file) {
-              uploadSingleFile(file, submissionId);
+              uploadFile(file, submissionId);
             });
           }, 2000);
         }
         console.log(response);
-      }, function (response) {
+      }, (response) => {
         $scope.state.submitting = false;
 
         if (response.data == null) {
@@ -135,17 +132,16 @@
             console.error(e.message);
           }
         }
-
         console.error(response);
       });
     }
 
-    function uploadSingleFile(file, submissionId) {
+    function uploadFile(file, submissionId) {
+      let reqObj = new XMLHttpRequest();
       let formData = new FormData();
+
       formData.append('file', file);
       file.progress = 0;
-
-      let reqObj = new XMLHttpRequest();
 
       reqObj.upload.addEventListener('progress', function (e) {
         if (e.lengthComputable) {
@@ -157,79 +153,29 @@
         }
       }, false);
 
-      reqObj.addEventListener('load', function (response) {
-        $scope.$apply(() => {
-          $scope.var.uploadTrackingNumber++;
-        });
+      reqObj.addEventListener('load',
+        (response) => {
+          $scope.$apply(() => {
+            $scope.var.uploadSuccessCount++;
+          });
 
-        if ($scope.var.uploadTrackingNumber >= $scope.var.selectedFiles.length) {
-          console.log('Upload complete');
-          //verifyFiles(submissionId, true);
-        }
-      }, false);
+          if ($scope.var.uploadSuccessCount >= $scope.var.selectedFiles.length) {
+            console.log('Upload complete');
+            $scope.state.reuploading = false;
+          }
+        }, false);
 
       reqObj.open('POST', `/upload/${submissionId}`);
       reqObj.onerror = () => {
-        /*if (!$scope.state.verifyingFiles)
-  verifyFiles(submissionId);*/
+        console.log('Upload failed');
+        $scope.state.reconnecting = true;
+        setTimeout(() => {
+          $scope.state.reconnecting = false;
+          $scope.state.reuploading = true;
+          uploadFile(file, submissionId);
+        }, $scope.const.retryTimeoutLength);
       };
       reqObj.send(formData);
-    }
-
-    function verifyFiles(submissionId, uploadFinished) {
-      $scope.state.verifyingFiles = true;
-      $scope.state.reuploading = false;
-
-      $http.post('/verifyfiles', '"' + submissionId + '"').then((response) => {
-        $scope.state.reconnecting = false;
-        $scope.state.reuploading = false;
-        $scope.state.verifyingFiles = false;
-        console.info('Files successfully uploaded');
-        //console.log(response);
-      }, (response) => {
-        if (response.data == null) {
-          $scope.state.reconnecting = true;
-          $scope.state.reuploading = false;
-          console.warn('Internet connection interrupted, attempting to reconnect...');
-          setTimeout(() => {
-            verifyFiles(submissionId);
-          }, $scope.const.retryTimeoutLength);
-        }
-        else {
-          console.error('Upload verification failed');
-          try {
-            if (response.data == 'Retry limit exceeded') {
-              $scope.state.reuploading = false;
-              $scope.state.submitting = false;
-              alert('Submission failed: ' + response.data);
-            }
-            else {
-              $scope.var.selectedFiles.forEach((file) => {
-                if (response.data.indexOf(file.name) < 0) {
-                  $scope.state.reconnecting = false;
-                  $scope.state.reuploading = true;
-                  if (uploadFinished) {
-                    $scope.var.uploadTrackingNumber--;
-                  }
-                  console.log('Attempting to reupload', file.name);
-                  setTimeout(
-                    uploadSingleFile(file, submissionId),
-                    $scope.const.retryTimeoutLength
-                  );
-                }
-              });
-            }
-          }
-          catch (e) {
-            $scope.state.reuploading = false;
-            $scope.state.submitting = false;
-            alert('Error: ' + e.message);
-            console.error(e.message);
-          }
-          $scope.state.verifyingFiles = false;
-        }
-        console.error(response);
-      });
     }
 
     function formatFileSize(size) {
@@ -245,29 +191,6 @@
       }
 
       return size + ' ' + unit;
-    }
-
-    function tryFunction(f) {
-      try {
-        return f();
-      }
-      catch (e) {
-        console.error(e.message);
-        return null;
-      }
-    }
-
-    function isEmpty(variable) {
-      try {
-        if (typeof variable === 'undefined' || variable == null || variable == '')
-          return true
-        else
-          return false
-      }
-      catch (e) {
-        console.error(e.message);
-        return true;
-      }
     }
   }
 })(angular.module('tcs-fault-tolerance-system'));
