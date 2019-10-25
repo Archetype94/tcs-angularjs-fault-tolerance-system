@@ -4,11 +4,9 @@
 
 (function (app) {
   app.controller('app-controller', config);
-
   config.$inject = ['$scope', '$window', '$http', '$timeout'];
 
   function config($scope, $window, $http, $timeout) {
-
     $scope.const = {
       maxFileLimit: 15,
       fileSizeLimit: 4000000,
@@ -23,7 +21,6 @@
       selectedFiles: [],
       model: {}
     };
-
 
     $scope.state = {
       submitting: false,
@@ -116,6 +113,7 @@
             });
           }, 2000);
         }
+
         console.log(response);
       }, (response) => {
         $scope.state.submitting = false;
@@ -132,6 +130,7 @@
             console.error(e.message);
           }
         }
+
         console.error(response);
       });
     }
@@ -151,7 +150,6 @@
             });
           }
         }, false);
-
       xhr.addEventListener('load',
         (response) => {
           $scope.$apply(() => {
@@ -178,7 +176,7 @@
     }
 
     function formatFileSize(size) {
-      let unit = '';
+      let unit;
 
       if (size >= 1000000) {
         size = (size / 1000000).toFixed(2);
