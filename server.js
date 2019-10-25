@@ -65,7 +65,6 @@ const
     }
   }).single('file')
 
-
 server.use('/', express.static(__dirname))
 server.use(express.json())
 
@@ -151,6 +150,6 @@ function tryUpdate(response, f) {
   }
   catch (error) {
     console.error(error)
-    response.status(500).send()
+    response.status(500).send('Internal Server Error')
   }
 }

@@ -125,7 +125,7 @@
         }
         else {
           try {
-            alert('Form invalid: ' + response.data);
+            alert('Request failed: ' + response.data);
           }
           catch (e) {
             alert('Submission failed: ' + e.message);
