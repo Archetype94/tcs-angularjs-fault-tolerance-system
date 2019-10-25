@@ -35,7 +35,6 @@ const
   fs = require('fs'),
   path = require('path'),
 
-  express = require('express'),
   server = express(),
 
   multer = require('multer'),
