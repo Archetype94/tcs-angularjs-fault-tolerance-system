@@ -137,23 +137,22 @@
     }
 
     function uploadFile(file, submissionId) {
-      let reqObj = new XMLHttpRequest();
+      let xhr = new XMLHttpRequest();
       let formData = new FormData();
 
       formData.append('file', file);
       file.progress = 0;
 
-      reqObj.upload.addEventListener('progress', function (e) {
-        if (e.lengthComputable) {
-          let uploadProgressCount = Math.round(e.loaded * 100 / e.total);
+      xhr.upload.addEventListener('progress',
+        (e) => {
+          if (e.lengthComputable) {
+            $scope.$apply(() => {
+              file.progress = Math.round(e.loaded * 100 / e.total);;
+            });
+          }
+        }, false);
 
-          $scope.$apply(() => {
-            file.progress = uploadProgressCount;
-          });
-        }
-      }, false);
-
-      reqObj.addEventListener('load',
+      xhr.addEventListener('load',
         (response) => {
           $scope.$apply(() => {
             $scope.var.uploadSuccessCount++;
@@ -165,8 +164,8 @@
           }
         }, false);
 
-      reqObj.open('POST', `/upload/${submissionId}`);
-      reqObj.onerror = () => {
+      xhr.open('POST', `/upload/${submissionId}`);
+      xhr.onerror = () => {
         console.log('Upload failed');
         $scope.state.reconnecting = true;
         setTimeout(() => {
@@ -175,7 +174,7 @@
           uploadFile(file, submissionId);
         }, $scope.const.retryTimeoutLength);
       };
-      reqObj.send(formData);
+      xhr.send(formData);
     }
 
     function formatFileSize(size) {

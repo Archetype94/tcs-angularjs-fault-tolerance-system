@@ -32,14 +32,17 @@ tryFunction(() => {
 })
 
 const
+  fs = require('fs'),
   path = require('path'),
+
   express = require('express'),
   server = express(),
 
   multer = require('multer'),
+  uploadDir = './uploads',
   fileUpload = multer({
     storage: multer.diskStorage({
-      destination: './uploads',
+      destination: uploadDir,
       filename: (request, file, f) => {
         f(null, request.params.submissionId + file.originalname);
       }
@@ -91,9 +94,12 @@ server.post('/submit', function (request, response) {
 })
 server.post('/upload/:submissionId', function (request, response) {
   console.log('Upload request received', request.params.submissionId)
-  //console.log(request.file.filename)
 
   tryUpdate(response, () => {
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
+    }
+
     fileUpload(request, response, (error) => {
       if (error) {
         badRequest(response, 'Upload error', error)
