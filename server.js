@@ -58,8 +58,7 @@ const
 
       if (extension && mimeType) {
         return callback(null, true)
-      }
-      else {
+      } else {
         callback('Invalid file type')
       }
     }
@@ -68,14 +67,14 @@ const
 server.use('/', express.static(__dirname))
 server.use(express.json())
 
-server.get('/', function (req, res) {
+server.get('/', function(req, res) {
   res.render('index')
 })
-server.get('/*', function (req, res) {
+server.get('/*', function(req, res) {
   res.sendFile(__dirname)
 })
 
-server.post('/submit', function (request, response) {
+server.post('/submit', function(request, response) {
   console.log('Submit request received', request.body)
 
   tryUpdate(response, () => {
@@ -83,15 +82,14 @@ server.post('/submit', function (request, response) {
       (error, result) => {
         if (error) {
           badRequest(response, 'Submission invalid', error)
-        }
-        else {
+        } else {
           console.log('Database updated successfully', result.insertedId)
           response.status(200).send(result.insertedId)
         }
       })
   })
 })
-server.post('/upload/:submissionId', function (request, response) {
+server.post('/upload/:submissionId', function(request, response) {
   console.log('Upload request received', request.params.submissionId)
 
   tryUpdate(response, () => {
@@ -102,20 +100,17 @@ server.post('/upload/:submissionId', function (request, response) {
     fileUpload(request, response, (error) => {
       if (error) {
         badRequest(response, 'Upload error', error)
-      }
-      else {
+      } else {
         if (request.file == undefined) {
           badRequest(response, 'Upload invalid', 'File does not exist')
-        }
-        else {
+        } else {
           db.collection('files').insertOne({
             formId: request.params.submissionId,
             path: "uploads/" + request.file.filename
           }, (error, result) => {
             if (error) {
               badRequest(response, 'File invalid', error)
-            }
-            else {
+            } else {
               console.log('File uploaded successfully', result.insertedId)
               response.status(200).send()
             }
@@ -126,7 +121,7 @@ server.post('/upload/:submissionId', function (request, response) {
   })
 })
 
-server.listen(8081, function () {
+server.listen(8081, function() {
   console.log('Server has successfully started')
 })
 
@@ -138,8 +133,7 @@ function badRequest(response, message, error) {
 function tryFunction(f) {
   try {
     return f();
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error)
   }
 }
@@ -147,8 +141,7 @@ function tryFunction(f) {
 function tryUpdate(response, f) {
   try {
     return f();
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error)
     response.status(500).send('Internal Server Error')
   }

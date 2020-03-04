@@ -1,8 +1,8 @@
-(function () {
+(function() {
   angular.module('tcs-fault-tolerance-system', []);
 })();
 
-(function (app) {
+(function(app) {
   app.controller('app-controller', config);
   config.$inject = ['$scope', '$window', '$http', '$timeout'];
 
@@ -48,7 +48,7 @@
       if ($scope.var.selectedFiles.length >= $scope.var.maxFileLimit)
         return;
 
-      $scope.$apply(function () {
+      $scope.$apply(function() {
         let length = $scope.const.maxFileLimit - $scope.var.selectedFiles.length;
         length = length > element.files.length ? element.files.length : length;
 
@@ -103,12 +103,11 @@
 
         if ($scope.var.selectedFiles.length == 0) {
           $scope.var.uploadSuccessCount = 0;
-        }
-        else {
-          $timeout(function () {
+        } else {
+          $timeout(function() {
             let submissionId = response.data;
 
-            $scope.var.selectedFiles.forEach(function (file) {
+            $scope.var.selectedFiles.forEach(function(file) {
               uploadFile(file, submissionId);
             });
           }, 2000);
@@ -119,13 +118,11 @@
         $scope.state.submitting = false;
 
         if (response.data == null) {
-          alert('Submission failed: ' + 'Please check your internet connection and try again')
-        }
-        else {
+          alert('Submission failed: ' + 'Please check your internet connection and try again');
+        } else {
           try {
             alert('Request failed: ' + response.data);
-          }
-          catch (e) {
+          } catch (e) {
             alert('Submission failed: ' + e.message);
             console.error(e.message);
           }
@@ -146,7 +143,7 @@
         (e) => {
           if (e.lengthComputable) {
             $scope.$apply(() => {
-              file.progress = Math.round(e.loaded * 100 / e.total);;
+              file.progress = Math.round(e.loaded * 100 / e.total);
             });
           }
         }, false);
@@ -181,8 +178,7 @@
       if (size >= 1000000) {
         size = (size / 1000000).toFixed(2);
         unit = 'MB';
-      }
-      else {
+      } else {
         size = (size / 1000).toFixed(2);
         unit = 'KB';
       }
